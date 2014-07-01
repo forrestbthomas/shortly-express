@@ -1,6 +1,7 @@
 var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
+var uuid = require('node-uuid');
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -20,7 +21,7 @@ app.configure(function() {
 });
 
 app.get('/', function(req, res) {
-  res.render('index');
+  res.render('login');
 });
 
 app.get('/login', function(req, res) {
@@ -32,7 +33,7 @@ app.get('/signup', function(req, res) {
 });
 
 app.get('/create', function(req, res) {
-  res.render('index');
+  res.render('login');
 });
 
 app.get('/links', function(req, res) {
@@ -79,6 +80,16 @@ app.post('/links', function(req, res) {
 /************************************************************/
 // This post request will be from the signup page and it will give us the username and desired password
 
+app.post('/login', function(req, res) {
+  util.checkUser(req.body.username, req.body.password, function(match){
+    if(match){
+      res.render('index');
+    }else{
+      res.render('login');
+    }
+  });
+});
+
 app.post('/signup', function(req, res){
   // username and hash will be collected from the request
   // used by the User model to give us a secure hash
@@ -93,6 +104,10 @@ app.post('/signup', function(req, res){
     // upon success of save, we want to redirect the new user back to the login page
     res.redirect('/login')
   });
+});
+
+app.post('/logout', function(req, res) {
+  res.redirect('/login')
 });
 
 /************************************************************/
