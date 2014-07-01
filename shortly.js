@@ -70,7 +70,19 @@ app.post('/links', function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
+app.get('/userMake', function(req, res){
+  console.log('YOU CLICKED THE SUPER SECRET USER FACTORY')
+  var user = new User({
+    username: 'whatever',
+    hash: 'mySuperSecretPassword'
+  });
 
+// console.log(user)
+  user.save().then(function(newUser){
+    Users.add(newUser);
+    res.send(200, newUser);
+  });
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
