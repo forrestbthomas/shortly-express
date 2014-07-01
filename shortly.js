@@ -23,6 +23,14 @@ app.get('/', function(req, res) {
   res.render('index');
 });
 
+app.get('/login', function(req, res) {
+  res.render('login');
+});
+
+app.get('/signup', function(req, res) {
+  res.render('signup');
+});
+
 app.get('/create', function(req, res) {
   res.render('index');
 });
@@ -69,18 +77,21 @@ app.post('/links', function(req, res) {
 /************************************************************/
 // Write your authentication routes here
 /************************************************************/
+// This post request will be from the signup page and it will give us the username and desired password
 
-app.get('/userMake', function(req, res){
-  console.log('YOU CLICKED THE SUPER SECRET USER FACTORY')
+app.post('/signup', function(req, res){
+  // username and hash will be collected from the request
+  // used by the User model to give us a secure hash
+  var username = req.body.username;
+  var pass = req.body.password;
   var user = new User({
-    username: 'whatever',
-    hash: 'mySuperSecretPassword'
+    username: username,
+    hash: pass
   });
-
-// console.log(user)
+  // insert newly created user into User table
   user.save().then(function(newUser){
-    Users.add(newUser);
-    res.send(200, newUser);
+    // upon success of save, we want to redirect the new user back to the login page
+    res.redirect('/login')
   });
 });
 
