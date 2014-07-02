@@ -18,10 +18,16 @@ app.configure(function() {
   app.use(partials());
   app.use(express.bodyParser())
   app.use(express.static(__dirname + '/public'));
+  app.use(express.cookieParser('secret'));
+  app.use(express.session());
 });
 
-app.get('/', function(req, res) {
-  res.render('login');
+app.get('/index', util.checkSession, function(req, res) {
+  res.render('index');
+});
+
+app.get('/create', util.checkSession, function(req, res) {
+  res.render('index');
 });
 
 app.get('/login', function(req, res) {
@@ -32,14 +38,10 @@ app.get('/signup', function(req, res) {
   res.render('signup');
 });
 
-app.get('/create', function(req, res) {
-  res.render('login');
-});
-
 app.get('/links', function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
-  })
+  });
 });
 
 app.post('/links', function(req, res) {
@@ -83,7 +85,11 @@ app.post('/links', function(req, res) {
 app.post('/login', function(req, res) {
   util.checkUser(req.body.username, req.body.password, function(match){
     if(match){
-      res.render('index');
+      req.session.regenerate(function(){
+        req.session.user = req.body.username;
+        console.log('before redirect: ' + req.session.user);
+        res.redirect('/index');
+      });
     }else{
       res.render('login');
     }
@@ -107,7 +113,8 @@ app.post('/signup', function(req, res){
 });
 
 app.post('/logout', function(req, res) {
-  res.redirect('/login')
+  req.session.destroy();
+  res.redirect('/login');
 });
 
 /************************************************************/
